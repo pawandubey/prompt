@@ -38,8 +38,8 @@ impl PromptColors for ColoredString {}
 
 fn main() {
     let username = whoami::username();
-    let ruby_version = env::var("RUBY_VERSION").unwrap_or("".to_string());
-    let current_dir = env::current_dir().unwrap_or(PathBuf::from(""));
+    let ruby_version = env::var("RUBY_VERSION").unwrap_or_else(|_| "".to_string());
+    let current_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from(""));
     let current_dir_basename = match current_dir.file_stem() {
         Some(name) => name.to_str().unwrap_or(""),
         None => "",

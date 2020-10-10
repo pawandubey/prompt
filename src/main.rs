@@ -2,6 +2,40 @@ use colored::*;
 use std::env;
 use std::path::PathBuf;
 
+trait PromptColors: Colorize {
+    fn prompt_green(self) -> ColoredString
+    where
+        Self: Sized,
+    {
+        self.truecolor(0, 175, 135)
+    }
+
+    fn on_prompt_green(self) -> ColoredString
+    where
+        Self: Sized,
+    {
+        self.on_truecolor(0, 175, 135)
+    }
+
+    fn prompt_purple(self) -> ColoredString
+    where
+        Self: Sized,
+    {
+        self.truecolor(149, 120, 251)
+    }
+
+    fn prompt_blue(self) -> ColoredString
+    where
+        Self: Sized,
+    {
+        self.truecolor(91, 133, 242)
+    }
+}
+
+impl<'a> PromptColors for &'a str {}
+
+impl PromptColors for ColoredString {}
+
 fn main() {
     let username = whoami::username();
     let ruby_version = env::var("RUBY_VERSION").unwrap_or("".to_string());
@@ -12,22 +46,16 @@ fn main() {
     };
     let git_prompt = "master";
 
-    let formatted_username = format!(" {} ", username)
-        .bold()
-        .white()
-        .on_truecolor(0, 175, 135);
+    let formatted_username = format!(" {} ", username).bold().white().on_prompt_green();
 
-    let formatted_ruby_version = format!("[{}]", ruby_version).truecolor(0, 175, 135);
+    let formatted_ruby_version = format!("[{}]", ruby_version).prompt_green();
 
-    let formatted_current_dir_basename = format!("[{}]", current_dir_basename)
-        .bold()
-        .truecolor(149, 120, 251);
+    let formatted_current_dir_basename =
+        format!("[{}]", current_dir_basename).bold().prompt_purple();
 
-    let formatted_git_prompt = format!("on {}", git_prompt.bold())
-        .italic()
-        .truecolor(91, 133, 242);
+    let formatted_git_prompt = format!("on {}", git_prompt.bold()).italic().prompt_blue();
 
-    let separator = ":".truecolor(0, 175, 135);
+    let separator = ":".prompt_green();
 
     println!(
         "{} {} {} {} {} {}",
@@ -38,7 +66,7 @@ fn main() {
         formatted_current_dir_basename,
         formatted_git_prompt
     );
-    println!("{}", "★ 𝞴".truecolor(0, 175, 135));
+    println!("{}", "★ 𝞴".prompt_green());
 }
 
 // Translation of the following bash script

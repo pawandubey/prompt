@@ -1,6 +1,7 @@
 use colored::*;
 use std::env;
 use std::path::PathBuf;
+use std::process::Command;
 
 trait PromptColors: Colorize {
     fn prompt_green(self) -> ColoredString
@@ -44,7 +45,15 @@ fn main() {
         Some(name) => name.to_str().unwrap_or(""),
         None => "",
     };
-    let git_prompt = "master";
+    let git_prompt_command = Command::new("bash")
+        .args(&["-c", "source ~/.git-prompt.sh; __git_ps1 \"%s\""])
+        .env("GIT_PS1_SHOWDIRTYSTATE", "1")
+        .env("GIT_PS1_SHOWUNTRACKEDFILES", "1")
+        .output()
+        .expect("Error");
+
+    let git_prompt_result = git_prompt_command.stdout;
+    let git_prompt = std::str::from_utf8(&git_prompt_result).unwrap();
 
     let formatted_username = format!(" {} ", username).bold().white().on_prompt_green();
 
@@ -53,7 +62,11 @@ fn main() {
     let formatted_current_dir_basename =
         format!("[{}]", current_dir_basename).bold().prompt_purple();
 
-    let formatted_git_prompt = format!("on {}", git_prompt.bold()).italic().prompt_blue();
+    let formatted_git_prompt = if git_prompt_command.status.success() {
+        format!("on {}", git_prompt.bold()).italic().prompt_blue()
+    } else {
+        "".prompt_blue()
+    };
 
     let separator = ":".prompt_green();
 

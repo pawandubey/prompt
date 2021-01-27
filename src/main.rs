@@ -65,7 +65,7 @@ fn main() {
     let formatted_git_prompt = if git_prompt_command.status.success() {
         format!("on {}", git_prompt.bold()).italic().prompt_blue()
     } else {
-        "".prompt_blue()
+        colored::ColoredString::from("")
     };
 
     let separator = ":".prompt_green();
